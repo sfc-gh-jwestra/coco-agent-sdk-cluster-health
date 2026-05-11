@@ -1,0 +1,1 @@
+Perform a clustering health check on all tables in {TARGET_SCHEMA}. Assess each table's clustering health, correlate with query performance, estimate costs, and send notifications using local MCP send_notification tool for any tables needing attention.

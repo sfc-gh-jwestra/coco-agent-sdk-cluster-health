@@ -229,11 +229,7 @@ async def run_health_check_agent() -> str:
 
     options = _make_options(HEALTH_CHECK_SYSTEM_PROMPT, max_turns=50)
 
-    prompt = (
-        f"Perform a clustering health check on all tables in {TARGET_SCHEMA}. "
-        "Assess each table's clustering health, correlate with query performance, "
-        "estimate costs, and send notifications for any tables needing attention."
-    )
+    prompt = PromptManager.load("health_check_user.txt", TARGET_SCHEMA=TARGET_SCHEMA)
 
     result = await _run_agent_with_retry(
         prompt=prompt,
@@ -267,11 +263,7 @@ async def run_remediation_agent(table_name: str) -> str:
 
     options = _make_options(REMEDIATION_SYSTEM_PROMPT, max_turns=20)
 
-    prompt = (
-        f"A human has approved reclustering for table: {table_name}. "
-        "Please proceed with the recluster_table tool and send a follow-up "
-        "notification with the results."
-    )
+    prompt = PromptManager.load("remediation_user.txt", table_name=table_name)
 
     result = await _run_agent_with_retry(
         prompt=prompt,

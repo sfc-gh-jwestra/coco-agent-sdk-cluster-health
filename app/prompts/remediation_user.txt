@@ -1,0 +1,1 @@
+A human has approved reclustering for table: {table_name}. Please proceed with the recluster_table tool and send a follow-up notification with the results.
