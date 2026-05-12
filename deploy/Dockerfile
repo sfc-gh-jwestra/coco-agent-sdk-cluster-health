@@ -3,9 +3,12 @@ FROM python:3.12-slim
 WORKDIR /app
 
 # Install the Cortex Code CLI (required by cortex-code-agent-sdk)
+# Cache-bust ARG ensures we always pull the latest CLI version on rebuild
+ARG CLI_CACHE_BUST=1
 RUN apt-get update && apt-get install -y curl && \
     curl -LsS https://ai.snowflake.com/static/cc-scripts/install.sh | sh && \
-    apt-get clean && rm -rf /var/lib/apt/lists/*
+    apt-get clean && rm -rf /var/lib/apt/lists/* && \
+    /root/.local/bin/cortex --version
 
 ENV PATH="/root/.local/bin:${PATH}"
 

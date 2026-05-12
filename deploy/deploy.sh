@@ -84,7 +84,7 @@ SERVICE_BASE_URL="${SERVICE_BASE_URL:-}"
 # --- Step 1: Build Docker image ---
 if [[ "$SKIP_BUILD" == false ]]; then
   echo "==> Building Docker image..."
-  docker build --platform linux/amd64 -t cluster-health-agent:latest -f "$SCRIPT_DIR/Dockerfile" "$PROJECT_DIR"
+  docker build --platform linux/amd64 --build-arg CLI_CACHE_BUST="$(date +%s)" -t cluster-health-agent:latest -f "$SCRIPT_DIR/Dockerfile" "$PROJECT_DIR"
   echo "    Build complete."
 else
   echo "==> Skipping Docker build (--skip-build)"

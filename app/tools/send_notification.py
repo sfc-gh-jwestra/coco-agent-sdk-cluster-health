@@ -15,7 +15,7 @@ from ..config import (
     RECIPIENTS_TABLE,
     SERVICE_BASE_URL,
 )
-from ..token import generate_approval_token
+from ..approval_token import generate_approval_token
 
 logger = logging.getLogger(__name__)
 
@@ -133,8 +133,8 @@ async def send_notification(args: dict) -> dict:
 
             # Send via Snowflake notification integration
             cur.execute(
-                f"CALL SYSTEM$SEND_SNOWFLAKE_NOTIFICATION("
-                f"'{NOTIFICATION_INTEGRATION}', '{payload}')"
+                "CALL SYSTEM$SEND_SNOWFLAKE_NOTIFICATION(%s, PARSE_JSON(%s))",
+                (NOTIFICATION_INTEGRATION, payload),
             )
 
             return {

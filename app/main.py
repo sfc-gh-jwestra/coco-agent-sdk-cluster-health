@@ -14,7 +14,7 @@ from fastapi.responses import HTMLResponse, JSONResponse
 
 from .agent import run_health_check_agent, run_remediation_agent
 from .config import CONNECTION_NAME
-from .token import validate_approval_token
+from .approval_token import validate_approval_token
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

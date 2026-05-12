@@ -2,8 +2,10 @@
 
 import asyncio
 import logging
+import sys
 import time
 import traceback
+from pathlib import Path
 
 import snowflake.connector
 
@@ -11,7 +13,6 @@ from cortex_code_agent_sdk import (
     AssistantMessage,
     CortexCodeAgentOptions,
     ResultMessage,
-    create_sdk_mcp_server,
     query,
 )
 
@@ -25,17 +26,11 @@ from .config import (
     THRESHOLD_CONSTANT_RATIO,
 )
 from .prompt_manager import PromptManager
-from .tools.recluster_table import recluster_table
-from .tools.send_notification import send_notification
 
 logger = logging.getLogger(__name__)
 
-# Create the SDK MCP server with both tools
-cluster_tools_server = create_sdk_mcp_server(
-    name="cluster-health-tools",
-    version="1.0.0",
-    tools=[send_notification, recluster_table],
-)
+MCP_SERVER_SCRIPT = str(Path(__file__).parent / "mcp_server.py")
+PYTHON_PATH = sys.executable
 
 HEALTH_CHECK_SYSTEM_PROMPT = PromptManager.load(
     "health_check.txt",
@@ -94,12 +89,15 @@ def _make_options(system_prompt: str, max_turns: int = 50) -> CortexCodeAgentOpt
         connection=CONNECTION_NAME,
         permission_mode="bypassPermissions",
         allow_dangerously_skip_permissions=True,
-        mcp_servers={"cluster-health-tools": cluster_tools_server},
+        mcp_servers={
+            "cluster-health-tools": {
+                "type": "stdio",
+                "command": PYTHON_PATH,
+                "args": [MCP_SERVER_SCRIPT],
+            },
+        },
         append_system_prompt=system_prompt,
         max_turns=max_turns,
-        # Don't inherit user/project settings — prevents auth issues in headless SPCS runs
-        setting_sources=[],
-        # Log CLI stderr at WARNING level so errors are visible in SPCS logs
         stderr=lambda line: logger.warning(f"[cortex-cli] {line}"),
     )
 
